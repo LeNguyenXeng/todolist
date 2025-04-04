@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 function App() {
   const [data, setData] = useState([]);
   const [name, setName] = useState("");
+  const [search, setSearch] = useState("");
 
   const handleChangeName = (event) => {
     setName(event.target.value);
@@ -37,11 +38,23 @@ function App() {
       const updatedData = prevData.map((item) =>
         item.id === id ? { ...item, name: value } : item
       );
-
       localStorage.setItem("data", JSON.stringify(updatedData));
-
       return updatedData;
     });
+  };
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+    const searchData = data.filter((item) =>
+      item.name.includes(event.target.value)
+    );
+    setData(searchData);
+    if (event.target.value == "") {
+      const local = JSON.parse(localStorage.getItem("data"));
+      if (local) {
+        setData(local);
+      }
+    }
   };
 
   useEffect(() => {
@@ -50,6 +63,7 @@ function App() {
       setData(local);
     }
   }, []);
+
   return (
     <>
       <section className="vh-100 gradient-custom-2">
@@ -72,6 +86,11 @@ function App() {
                         placeholder="Nhập tên..."
                         aria-label="Recipient's username"
                         aria-describedby="basic-addon2"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && name) {
+                            handleClick();
+                          }
+                        }}
                       />
                       <Button
                         variant="primary"
@@ -80,6 +99,15 @@ function App() {
                       >
                         Thêm
                       </Button>
+                    </InputGroup>
+                    <InputGroup className="mb-3">
+                      <Form.Control
+                        placeholder="Search..."
+                        aria-label="Recipient's username"
+                        aria-describedby="basic-addon2"
+                        onChange={handleSearch}
+                        value={search}
+                      />
                     </InputGroup>
                   </div>
                   <table className="table text-white mb-0">
